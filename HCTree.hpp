@@ -1,3 +1,9 @@
+/* File: HCTree.hpp
+ * File contains all of the methods used to build huffman trees
+ * all implimentations are in HCTree.hpp. Methods used in thi file
+ * are used in compression and decompression of files.
+ * */
+
 #ifndef HCTREE_HPP
 #define HCTREE_HPP
 
@@ -5,9 +11,10 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <bitset>
 #include "HCNode.hpp"
-//#include "BitInputStream.hpp"
-//#include "BitOutputStream.hpp"
+#include "BitInputStream.hpp"
+#include "BitOutputStream.hpp"
 
 using namespace std;
 
@@ -50,13 +57,27 @@ public:
      *  and leaves[i] points to the leaf node containing byte i.
      */
     void build(const vector<int>& freqs);
+    
+    /* Encodes the tree and places it in the header of the outputfile*/
+    void buildHC(BitOutputStream& out, string str); 
+    /*helper method to encode tree*/
+    void buildHeader(HCNode* mov, BitOutputStream& out,string str);
+    
+    /* rebuild the tree using the information in the header*/
+    void buildBits(BitInputStream& in);
+
+    /* recursive helper methos used in build bits which builds the tree 
+    * using only the information at in the header
+    */
+    HCNode* bitHelp(BitInputStream& in, HCNode* par);
+
 
     /** Write to the given BitOutputStream
      *  the sequence of bits coding the given symbol.
      *  PRECONDITION: build() has been called, to create the coding
      *  tree, and initialize root pointer and leaves vector.
      */
-    //void encode(byte symbol, BitOutputStream& out) const;
+    void encode(byte symbol, BitOutputStream& out) const;
 
     /** Write to the given ofstream
      *  the sequence of bits (as ASCII) coding the given symbol.
@@ -72,7 +93,7 @@ public:
      *  PRECONDITION: build() has been called, to create the coding
      *  tree, and initialize root pointer and leaves vector.
      */
-    //int decode(BitInputStream& in) const;
+    int decode(BitInputStream& in) const;
 
     /** Return the symbol coded in the next sequence of bits (represented as
      *  ASCII text) from the ifstream.
